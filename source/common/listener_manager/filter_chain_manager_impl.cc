@@ -17,6 +17,7 @@
 #include "absl/container/node_hash_map.h"
 #include "absl/strings/match.h"
 #include "absl/strings/str_cat.h"
+#include <stdio.h>
 
 namespace Envoy {
 namespace Server {
@@ -475,6 +476,7 @@ std::pair<T, std::vector<Network::Address::CidrRange>> makeCidrListEntry(const s
 const Network::FilterChain*
 FilterChainManagerImpl::findFilterChain(const Network::ConnectionSocket& socket,
                                         const StreamInfo::StreamInfo& info) const {
+  printf(matcher_ ? "DEBUG matcher_ is not null\n" : "DEBUG matcher_ is null\n")
   if (matcher_) {
     return findFilterChainUsingMatcher(socket, info);
   }
@@ -515,6 +517,8 @@ FilterChainManagerImpl::findFilterChainUsingMatcher(const Network::ConnectionSoc
   ASSERT(match_result.match_state_ == Matcher::MatchState::MatchComplete,
          "Matching must complete for network streams.");
   if (match_result.result_) {
+    printf("DEBUG2 %s\n", filter_chains_by_name_)
+    printf("DEBUG3 %s\n", info)
     const auto result = match_result.result_();
     return result->getTyped<Configuration::FilterChainBaseAction>().get(filter_chains_by_name_,
                                                                         info);
